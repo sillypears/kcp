@@ -220,4 +220,6 @@ lib/*
 lib64
 
 .env
-*.json
+boxes.json
+*.csv
+!output.csv
