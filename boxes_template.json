@@ -1,0 +1,22 @@
+{
+    "boxes": [
+        {
+            "name": "Box 1",
+            "label": "B1",
+            "capacity": 81,
+            "height": 9,
+            "width": 9,
+            "dedicated": false,
+            "allow_add": true
+        },
+        {
+            "name": "Box 2",
+            "label": "B2",
+            "capacity": 72,
+            "height": 9,
+            "width": 8,
+            "dedicated": false,
+            "allow_add": false
+        }
+    ]
+}
