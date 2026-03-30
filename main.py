@@ -6,7 +6,6 @@ from argparse import ArgumentParser, Namespace
 from datetime import datetime
 
 def load_boxes_config(config_path: str) -> list:
-    """Load boxes configuration from JSON"""
     try:
         with open(config_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -17,7 +16,6 @@ def load_boxes_config(config_path: str) -> list:
 
 
 def build_dedicated_mapping(boxes: list) -> Dict[str, str]:
-    """Create maker_name -> label mapping for dedicated boxes"""
     dedicated = {}
     for box in boxes:
         if box.get("dedicated") and box.get("maker_name"):
@@ -28,7 +26,6 @@ def build_dedicated_mapping(boxes: list) -> Dict[str, str]:
 
 
 def get_consolidation_box(boxes: list) -> str:
-    """Find the best consolidation box (largest non-dedicated + allow_add=True)"""
     candidates = [
         box for box in boxes
         if not box.get("dedicated", False) and box.get("allow_add", True)
@@ -42,7 +39,6 @@ def get_consolidation_box(boxes: list) -> str:
 
 
 def get_no_add_boxes(boxes: list) -> set:
-    """Return set of box labels that should never receive new caps"""
     return {box["label"] for box in boxes if not box.get("allow_add", True)}
 
 
@@ -73,7 +69,6 @@ def get_maker_distribution(df: pd.DataFrame) -> Dict:
 
 
 def suggest_target_box(maker: str, info: dict, dedicated: Dict, consolidation: str) -> str:
-    """Decide best target box for a maker"""
     if maker in dedicated:
         return dedicated[maker]
     
@@ -105,6 +100,64 @@ def generate_moves(df: pd.DataFrame, maker_groups: dict, dedicated: Dict,
     moves.sort(key=lambda x: x['count'], reverse=True)
     return moves
 
+def get_current_counts(df: pd.DataFrame) -> Dict[str, int]:
+    """Return current number of caps per box label"""
+    counts = df['Box'].value_counts().to_dict()
+    return {str(k): v for k, v in counts.items() if str(k)}
+
+
+def display_boxes_visual(boxes: list, current_counts: Dict[str, int]):
+    """Display all boxes with visual grid representation"""
+    print("\n" + "="*80)
+    print("                  BOX INVENTORY - VISUAL LAYOUT")
+    print("="*80)
+    
+    for box in boxes:
+        label = box.get("label", "??")
+        name = box.get("name", "Unnamed")
+        capacity = box.get("capacity", 0)
+        height = box.get("height", 1)
+        width = box.get("width", 1)
+        dedicated = box.get("dedicated", False)
+        allow_add = box.get("allow_add", True)
+        
+        current = current_counts.get(label, 0)
+        fill_percent = (current / capacity * 100) if capacity > 0 else 0
+        
+        status = "DEDICATED" if dedicated else ("CONSOLIDATION" if label == "B10" else "REGULAR")
+        add_status = "✓ Can add" if allow_add else "✗ No adds"
+        
+        print(f"\n{label:3} | {name:<25} | {current:3}/{capacity:3} ({fill_percent:5.1f}%) | {status} | {add_status}")
+        
+        # Visual grid
+        total_cells = height * width
+        filled = min(current, capacity)
+        empty = capacity - filled
+        
+        # Simple row-by-row grid (each cell 1x1 for now, with note for merged if needed)
+        print("   ┌" + "───┬" * (width - 1) + "───┐")
+        
+        cell_idx = 0
+        for row in range(height):
+            line = "   │"
+            for col in range(width):
+                if cell_idx < filled:
+                    line += " █ │"
+                elif cell_idx < capacity:
+                    line += " · │"
+                else:
+                    line += "   │"  # beyond capacity (rare)
+                cell_idx += 1
+            print(line)
+            if row < height - 1:
+                print("   ├" + "───┼" * (width - 1) + "───┤")
+        print("   └" + "───┴" * (width - 1) + "───┘")
+        
+        # Note about merged cells if capacity doesn't match grid size
+        if capacity < total_cells:
+            print(f"   Note: Only {capacity} spots used → some cells merged in real life (e.g. 2x1)")
+    
+    print("\n" + "="*80)
 
 def print_summary(df: pd.DataFrame, maker_groups: dict, moves: List[Dict],
                   dedicated: Dict, consolidation: str, no_add: set):
@@ -134,36 +187,61 @@ def print_summary(df: pd.DataFrame, maker_groups: dict, moves: List[Dict],
         if preview:
             print(f"     └─ {preview}")
 
+def validate_unique_keycaps(df: pd.DataFrame):
+    print("\n" + "="*60)
+    print("              UNIQUENESS VALIDATION")
+    print("="*60)
+    
+    duplicates = df['Unique_Name'].value_counts()
+    duplicates = duplicates[duplicates > 1]
+    
+    if duplicates.empty:
+        print("All Unique_Names are unique. No duplicates found.")
+    else:
+        print(f"WARNING: {len(duplicates)} duplicate Unique_Name(s) found!\n")
+        for unique_name, count in duplicates.items():
+            print(f"   • {unique_name}  →  appears {count} times")
+        
+        # Show which rows have duplicates for easy debugging
+        print("\nDuplicate entries details:")
+        for unique_name in duplicates.index:
+            dup_rows = df[df['Unique_Name'] == unique_name]
+            for _, row in dup_rows.iterrows():
+                print(f"      {row['Unique_Name']} | Maker: {row['Maker']} | Box: {row['Box']}")
+    
+    print("="*60 + "\n")
 
 def parse_args() -> Namespace:
-    parser = ArgumentParser(description="Clack & Order - Artisan Keycap Organizer")
+    parser = ArgumentParser(description="Dumb")
     
     parser.add_argument('-d', '--debug', 
                         dest="DEBUG", 
                         default=False, 
-                        action="store_true",
-                        help="Enable debug output")
+                        action="store_true"
+    )
     
     parser.add_argument('-b', '--boxes', 
                         dest="boxes", 
-                        default="boxes.json", 
-                        help="Path to boxes.json config file (default: boxes.json)")
-    
+                        default="boxes.json"
+    )
     parser.add_argument('-f', '--file', 
-                        dest="input_file", 
-                        required=True, 
-                        help="Path to the keycaps CSV file (required)")
-    
+                        dest="input_file"
+    )
     parser.add_argument('-o', '--output', 
                         dest="output_file", 
-                        default=None, 
-                        help="Output filename for moves CSV (default: auto-generated with timestamp)")
+                        default=None
+    )
+
+    parser.add_argument('-v', '--visualize', 
+                        dest="visualize", 
+                        default=False, 
+                        action="store_true"
+    )
     
     return parser.parse_args()
 
 
-def main():
-    args = parse_args()
+def main(args):
     
     if args.output_file is None:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -175,9 +253,15 @@ def main():
     no_add_boxes = get_no_add_boxes(boxes)
     
     df = read_keycaps(args.input_file)
+
+    validate_unique_keycaps(df)
+
     maker_groups = get_maker_distribution(df)
     moves = generate_moves(df, maker_groups, dedicated, consolidation, no_add_boxes)
     
+    if args.visualize:
+        display_boxes_visual(boxes, get_current_counts(df))
+        sys.exit()
     print_summary(df, maker_groups, moves, dedicated, consolidation, no_add_boxes)
     
     # Export full move list
@@ -189,4 +273,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_args()
+    main(args)
