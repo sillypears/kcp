@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    ports:
+      - "6005:6005"
+    env_file:
+      - .env.production
+    environment:
+      - HOSTNAME=0.0.0.0
+      - PORT=6005
+    restart: unless-stopped

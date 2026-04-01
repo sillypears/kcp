@@ -1,0 +1,1 @@
+time docker build . -t kc_purchases

@@ -264,7 +264,6 @@ def main(args):
         sys.exit()
     print_summary(df, maker_groups, moves, dedicated, consolidation, no_add_boxes)
     
-    # Export full move list
     moves_df = pd.DataFrame(moves)
     moves_df.to_csv(args.output_file, index=False)
     
