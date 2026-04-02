@@ -119,6 +119,44 @@ body {
   background: #e74c3c;
 }
 
+.unboxed-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  margin: 1.5rem 1.5rem 0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.unboxed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--border);
+}
+
+.unboxed-header h2 {
+  font-size: 1rem;
+  color: var(--accent);
+}
+
+.unboxed-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+.unboxed-cap {
+  width: 100px;
+  min-height: 60px;
+  cursor: grab;
+}
+
+.unboxed-cap:active {
+  cursor: grabbing;
+}
+
 .boxes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));

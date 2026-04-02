@@ -75,6 +75,7 @@ function App() {
 
   const totalCapacity = inventory.reduce((s, b) => s + (b.capacity || 0), 0);
   const totalUsed = inventory.reduce((s, b) => s + (b.current_count || 0), 0);
+  const unboxed = keycaps.filter((c) => !c.box_id);
 
   if (loading) {
     return <div style={{ padding: "2rem", textAlign: "center" }}>Loading...</div>;
@@ -124,7 +125,7 @@ function App() {
           const boxCaps = keycaps.filter((c) => c.box_id === box.id);
           const inv = inventory.find((i) => i.id === box.id);
           const pct = box.capacity ? (boxCaps.length / box.capacity) * 100 : 0;
-          const isDropTarget = movingCap && box.id !== movingCap.box_id;
+          const isDropTarget = movingCap && (box.id !== movingCap.box_id || !movingCap.box_id);
           const width = box.width || 9;
           const height = box.height || 9;
 
@@ -205,6 +206,33 @@ function App() {
           );
         })}
       </div>
+
+      {unboxed.length > 0 && (
+        <div className="unboxed-section">
+          <div className="unboxed-header">
+            <h2>Unboxed Keycaps</h2>
+            <span className="box-badge">{unboxed.length}</span>
+          </div>
+          <div className="unboxed-grid">
+            {unboxed.map((cap) => (
+              <div
+                key={cap.id}
+                className={`keycap-cell filled unboxed-cap${movingCap?.id === cap.id ? " selected" : ""}`}
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData("text/plain", cap.id);
+                  setMovingCap(cap);
+                }}
+                onClick={() => setSelectedCap(cap)}
+              >
+                <span className="maker">{cap.maker_name?.split(" ")[0]}</span>
+                <span className="sculpt">{cap.sculpt}</span>
+                {cap.colorway && <span className="colorway">{cap.colorway}</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {selectedCap && (
         <KeycapModal

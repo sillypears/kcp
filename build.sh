@@ -1,1 +1,1 @@
-time docker build . -t kc_purchases
+time docker buildx build -t kc_purchases --platform linux/amd64 .

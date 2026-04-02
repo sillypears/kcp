@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 from api.routes import keycaps, boxes, makers, stats
 
 load_dotenv(".env.production", override=False)
-load_dotenv(".env", override=False)
 
 
 @asynccontextmanager
@@ -51,6 +50,6 @@ if __name__ == "__main__":
     uvicorn.run(
         "server:app",
         host=os.getenv("HOSTNAME", "0.0.0.0"),
-        port=int(os.getenv("PORT", "6000")),
+        port=int(os.getenv("PORT", "6001")),
         reload=True,
     )
