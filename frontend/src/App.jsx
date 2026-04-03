@@ -175,6 +175,7 @@ function App() {
                       <div
                         key={`${x}-${y}`}
                         className={`keycap-cell${isEmpty ? " empty" : " filled"}${isSelected ? " selected" : ""}${isMoving ? " selected" : ""}`}
+                        title={!isEmpty ? `ID: ${cap.id}\nMaker: ${cap.maker_name}${cap.collab_name ? ' x ' + cap.collab_name : ''}\nSculpt: ${cap.sculpt}\nColorway: ${cap.colorway || '—'}\nBox: ${cap.label || '—'}\nPosition: (${cap.cell_x}, ${cap.cell_y})` : ''}
                         draggable={!isEmpty}
                         onDragStart={(e) => {
                           if (!isEmpty) {
@@ -231,6 +232,7 @@ function App() {
               <div
                 key={cap.id}
                 className={`keycap-cell filled unboxed-cap${movingCap?.id === cap.id ? " selected" : ""}`}
+                title={`ID: ${cap.id}\nMaker: ${cap.maker_name}${cap.collab_name ? ' x ' + cap.collab_name : ''}\nSculpt: ${cap.sculpt}\nColorway: ${cap.colorway || '—'}\nBox: ${cap.label || 'Unboxed'}`}
                 draggable
                 onDragStart={(e) => {
                   e.dataTransfer.setData("text/plain", cap.id);
