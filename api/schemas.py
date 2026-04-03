@@ -34,9 +34,9 @@ class KeycapResponse(KeycapBase):
 
 class MoveKeycap(BaseModel):
     keycap_id: int
-    box_id: int
-    cell_x: int
-    cell_y: int
+    box_id: Optional[int] = None
+    cell_x: Optional[int] = None
+    cell_y: Optional[int] = None
 
 
 class MakerBase(BaseModel):

@@ -4,7 +4,7 @@
 Keycap collection organizer. Shows artisan keycaps arranged in physical box grids, with drag-and-drop to move caps between boxes and within boxes. Unboxed keycaps (no `box_id`) are displayed in a section below all boxes, where they can be dragged into box grids.
 
 ## Tech Stack
-- **Backend**: FastAPI + MariaDB (python-mariadb connector)
+- **Backend**: FastAPI + PostgreSQL (psycopg2)
 - **Frontend**: React + Vite, served by FastAPI from `frontend/dist/`
 - **Env**: `python-dotenv` loads `.env.production` (has DB creds, ports)
 
@@ -43,6 +43,8 @@ frontend/
     App.jsx                  # Main app: grid rendering with cell_x/cell_y positioning
     api.js                   # API client (moveKeycap takes keycap_id, box_id, cell_x, cell_y)
     index.css                # Dark theme styles
+  dist/                      # Built frontend (includes PWA manifest, service worker)
+  vite.config.js            # PWA config via vite-plugin-pwa
 ```
 
 ## Key Implementation Details
@@ -62,6 +64,7 @@ frontend/
 ### Move Endpoint
 - `POST /api/keycaps/move` — body: `{keycap_id, box_id, cell_x, cell_y}`
 - All four fields required
+- Setting `box_id` to `null` moves the keycap to the unboxed section (clears cell_x and cell_y)
 
 ### Frontend Grid
 - Renders `height` rows × `width` columns per box
@@ -100,3 +103,5 @@ cd frontend && npm run dev
 - `.env.production` is in `.gitignore` — do NOT commit it
 - The original `main.py` is a CLI tool for suggesting cap reorganization (not web-related)
 - `caps.csv` was the original import source; inserts were generated via `generate_inserts.py`
+- PWA (Progressive Web App) enabled via vite-plugin-pwa — users can "Add to Home Screen" on mobile
+- Service worker requires HTTPS (or localhost) to register

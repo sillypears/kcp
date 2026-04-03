@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
-import mariadb
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 from api.database import get_db
 
@@ -7,8 +8,8 @@ router = APIRouter(prefix="/api/stats", tags=["stats"])
 
 
 @router.get("/maker-counts")
-def maker_counts(db: mariadb.Connection = Depends(get_db)):
-    cur = db.cursor(dictionary=True)
+def maker_counts(db: psycopg2.extensions.connection = Depends(get_db)):
+    cur = db.cursor(cursor_factory=RealDictCursor)
     cur.execute("""
         SELECT m.id, m.maker_name, COUNT(k.id) AS sculpt_count
         FROM makers m
@@ -20,8 +21,8 @@ def maker_counts(db: mariadb.Connection = Depends(get_db)):
 
 
 @router.get("/box-inventory")
-def box_inventory(db: mariadb.Connection = Depends(get_db)):
-    cur = db.cursor(dictionary=True)
+def box_inventory(db: psycopg2.extensions.connection = Depends(get_db)):
+    cur = db.cursor(cursor_factory=RealDictCursor)
     cur.execute("""
         SELECT b.id, b.label, b.name, b.capacity, b.height, b.width,
                b.dedicated, b.allow_add, b.maker_name,
@@ -35,12 +36,16 @@ def box_inventory(db: mariadb.Connection = Depends(get_db)):
 
 
 @router.get("/overview")
-def overview(db: mariadb.Connection = Depends(get_db)):
-    cur = db.cursor(dictionary=True)
+def overview(db: psycopg2.extensions.connection = Depends(get_db)):
+    cur = db.cursor(cursor_factory=RealDictCursor)
     cur.execute("SELECT COUNT(*) AS total_keycaps FROM keycaps")
     total_keycaps = cur.fetchone()["total_keycaps"]
     cur.execute("SELECT COUNT(*) AS total_makers FROM makers")
     total_makers = cur.fetchone()["total_makers"]
     cur.execute("SELECT COUNT(*) AS total_boxes FROM boxes")
     total_boxes = cur.fetchone()["total_boxes"]
-    return {**total_keycaps, **total_makers, **total_boxes}
+    return {
+        "total_keycaps": total_keycaps,
+        "total_makers": total_makers,
+        "total_boxes": total_boxes,
+    }
