@@ -192,7 +192,11 @@ function App() {
                       >
                         {!isEmpty ? (
                           <>
-                            <span className="maker">{cap.maker_name?.split(" ")[0]}</span>
+                            <span className="maker">
+                              {console.log(cap.maker_name)}
+                              {cap.maker_name?.split(" ")[0]}
+                              {cap.collab_name && <span className="collab"> x {cap.collab_name}</span>}
+                            </span>
                             <span className="sculpt">{cap.sculpt}</span>
                             {cap.colorway && <span className="colorway">{cap.colorway}</span>}
                           </>
@@ -225,7 +229,10 @@ function App() {
                 }}
                 onClick={() => setSelectedCap(cap)}
               >
-                <span className="maker">{cap.maker_name?.split(" ")[0]}</span>
+                <span className="maker">
+                  {cap.maker_name?.split(" ")[0]}
+                  {cap.collab_name && <span className="collab"> x {cap.collab_name}</span>}
+                </span>
                 <span className="sculpt">{cap.sculpt}</span>
                 {cap.colorway && <span className="colorway">{cap.colorway}</span>}
               </div>
@@ -284,6 +291,7 @@ function KeycapModal({ cap, boxes, makers, onClose, onDelete, onEdit, onMove }) 
     sculpt: cap.sculpt,
     colorway: cap.colorway || "",
     maker_id: cap.maker_id,
+    collab_id: cap.collab_id || "",
     box_id: cap.box_id,
   });
 
@@ -327,6 +335,20 @@ function KeycapModal({ cap, boxes, makers, onClose, onDelete, onEdit, onMove }) 
               </select>
             </div>
             <div className="form-group">
+              <label>Collab Maker</label>
+              <select
+                value={form.collab_id || ""}
+                onChange={(e) => setForm({ ...form, collab_id: e.target.value ? Number(e.target.value) : null })}
+              >
+                <option value="">— None —</option>
+                {makers.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.maker_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
               <label>Box</label>
               <select
                 value={form.box_id || ""}
@@ -347,6 +369,12 @@ function KeycapModal({ cap, boxes, makers, onClose, onDelete, onEdit, onMove }) 
               <span className="detail-label">Maker</span>
               <span>{cap.maker_name || "—"}</span>
             </div>
+            {cap.collab_name && (
+              <div className="detail-row">
+                <span className="detail-label">Collab</span>
+                <span>{cap.collab_name}</span>
+              </div>
+            )}
             <div className="detail-row">
               <span className="detail-label">Sculpt</span>
               <span>{cap.sculpt}</span>
@@ -443,7 +471,7 @@ function MoveModal({ cap, boxes, inventory, onClose, onMove }) {
 }
 
 function AddModal({ boxes, makers, onClose, onAdd }) {
-  const [form, setForm] = useState({ sculpt: "", colorway: "", maker_id: "", box_id: "" });
+  const [form, setForm] = useState({ sculpt: "", colorway: "", maker_id: "", collab_id: "", box_id: "" });
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -451,6 +479,7 @@ function AddModal({ boxes, makers, onClose, onAdd }) {
       sculpt: form.sculpt,
       colorway: form.colorway || null,
       maker_id: form.maker_id ? Number(form.maker_id) : null,
+      collab_id: form.collab_id ? Number(form.collab_id) : null,
       box_id: form.box_id ? Number(form.box_id) : null,
     });
   };
@@ -480,6 +509,20 @@ function AddModal({ boxes, makers, onClose, onAdd }) {
             <select
               value={form.maker_id}
               onChange={(e) => setForm({ ...form, maker_id: e.target.value })}
+            >
+              <option value="">— None —</option>
+              {makers.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.maker_name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Collab Maker</label>
+            <select
+              value={form.collab_id}
+              onChange={(e) => setForm({ ...form, collab_id: e.target.value })}
             >
               <option value="">— None —</option>
               {makers.map((m) => (

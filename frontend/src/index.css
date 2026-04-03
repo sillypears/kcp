@@ -9,14 +9,14 @@
   --surface: #16213e;
   --surface-hover: #1a2744;
   --border: #0f3460;
-  --accent: #e94560;
-  --accent-hover: #ff6b81;
+  --accent: #ee7943;
+  --accent-hover: #f86b2a;
   --text: #eee;
   --text-muted: #8892b0;
   --success: #64ffda;
   --cell-filled: #2d4a7a;
   --cell-empty: #1e2d4a;
-  --cell-selected: #e94560;
+  --cell-selected: #ff5d3c;
   --cell-hover: #3a5f9e;
   --modal-bg: rgba(0, 0, 0, 0.7);
 }
@@ -253,6 +253,11 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+}
+
+.keycap-cell .collab {
+  color: var(--accent);
+  font-weight: 400;
 }
 
 .keycap-cell .sculpt {

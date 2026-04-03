@@ -4,6 +4,7 @@ from typing import Optional
 
 class KeycapBase(BaseModel):
     maker_id: Optional[int] = None
+    collab_id: Optional[int] = None
     box_id: Optional[int] = None
     cell_x: Optional[int] = None
     cell_y: Optional[int] = None
@@ -17,6 +18,7 @@ class KeycapCreate(KeycapBase):
 
 class KeycapUpdate(BaseModel):
     maker_id: Optional[int] = None
+    collab_id: Optional[int] = None
     box_id: Optional[int] = None
     cell_x: Optional[int] = None
     cell_y: Optional[int] = None
@@ -27,6 +29,7 @@ class KeycapUpdate(BaseModel):
 class KeycapResponse(KeycapBase):
     id: int
     maker_name: Optional[str] = None
+    collab_name: Optional[str] = None
     label: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
