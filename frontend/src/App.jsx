@@ -17,6 +17,7 @@ function App() {
   const [makers, setMakers] = useState([]);
   const [inventory, setInventory] = useState([]);
   const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [selectedCap, setSelectedCap] = useState(null);
   const [movingCap, setMovingCap] = useState(null);
   const [showMoveModal, setShowMoveModal] = useState(false);
@@ -68,7 +69,13 @@ function App() {
   };
 
   const handleEdit = async (id, data) => {
-    await updateKeycap(id, data);
+    const cleaned = {
+      ...data,
+      maker_id: data.maker_id || null,
+      collab_id: data.collab_id === "" ? null : data.collab_id,
+      box_id: data.box_id || null,
+    };
+    await updateKeycap(id, cleaned);
     setSelectedCap(null);
     loadData();
   };
@@ -89,9 +96,11 @@ function App() {
           <input
             className="search-input"
             placeholder="Search maker, sculpt, colorway..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && setSearch(searchInput)}
           />
+          <button className="btn" onClick={() => setSearch(searchInput)}>Search</button>
           <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
             + Add Keycap
           </button>
@@ -291,7 +300,7 @@ function KeycapModal({ cap, boxes, makers, onClose, onDelete, onEdit, onMove }) 
     sculpt: cap.sculpt,
     colorway: cap.colorway || "",
     maker_id: cap.maker_id,
-    collab_id: cap.collab_id || "",
+    collab_id: cap.collab_id !== null ? cap.collab_id : "",
     box_id: cap.box_id,
   });
 
@@ -522,7 +531,7 @@ function AddModal({ boxes, makers, onClose, onAdd }) {
             <label>Collab Maker</label>
             <select
               value={form.collab_id}
-              onChange={(e) => setForm({ ...form, collab_id: e.target.value })}
+                onChange={(e) => setForm({ ...form, collab_id: e.target.value ? Number(e.target.value) : null })}
             >
               <option value="">— None —</option>
               {makers.map((m) => (
