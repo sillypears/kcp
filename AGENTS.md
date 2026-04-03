@@ -1,7 +1,7 @@
 # Artisan Whisperer - Agent Instructions
 
 ## Project Overview
-Keycap collection organizer. Shows artisan keycaps arranged in physical box grids, with drag-and-drop to move caps between boxes and within boxes.
+Keycap collection organizer. Shows artisan keycaps arranged in physical box grids, with drag-and-drop to move caps between boxes and within boxes. Unboxed keycaps (no `box_id`) are displayed in a section below all boxes, where they can be dragged into box grids.
 
 ## Tech Stack
 - **Backend**: FastAPI + MariaDB (python-mariadb connector)
@@ -69,6 +69,11 @@ frontend/
 - Drag from any filled cell → drop on any empty cell → updates position
 - Click empty cell while a cap is selected → moves cap there
 - MoveModal (from keycap detail) defaults to `cell_x=0, cell_y=0`
+
+### Unboxed Keycaps
+- Keycaps with `box_id = null` render in a flex-wrapping grid below all boxes
+- Draggable from unboxed section into any empty box cell
+- Boxes highlight as drop targets when an unboxed cap is being dragged
 
 ## Running
 

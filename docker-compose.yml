@@ -1,6 +1,7 @@
 services:
   app:
-    build: .
+    image: kc_purchases:latest
+    container_name: kc_p
     ports:
       - "6005:6005"
     env_file:

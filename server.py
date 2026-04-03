@@ -3,6 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 import os
+import re
 import uvicorn
 from dotenv import load_dotenv
 
@@ -28,14 +29,27 @@ frontend_dist = os.path.join(
 )
 
 if os.path.isdir(frontend_dist):
-    app.mount(
-        "/assets",
-        StaticFiles(directory=os.path.join(frontend_dist, "assets")),
-        name="assets",
-    )
+    # Serve manifest directly before static mount
+    @app.get("/manifest.webmanifest")
+    async def serve_manifest():
+        return FileResponse(
+            os.path.join(frontend_dist, "manifest.webmanifest"),
+            media_type="application/manifest+json",
+        )
 
-    @app.get("/{full_path:path}")
-    async def serve_frontend(full_path: str):
+    @app.get("/sw.js")
+    async def serve_sw():
+        return FileResponse(os.path.join(frontend_dist, "sw.js"))
+
+    @app.get("/registerSW.js")
+    async def serve_reg_sw():
+        return FileResponse(os.path.join(frontend_dist, "registerSW.js"))
+
+    @app.get("/{path:path}")
+    async def serve_frontend(path: str):
+        file_path = os.path.join(frontend_dist, path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
         return FileResponse(os.path.join(frontend_dist, "index.html"))
 else:
 

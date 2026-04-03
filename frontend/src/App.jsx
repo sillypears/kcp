@@ -402,6 +402,15 @@ function MoveModal({ cap, boxes, inventory, onClose, onMove }) {
         <p style={{ color: "var(--text-muted)", marginBottom: "1rem" }}>
           Currently in {cap.label || "no box"}
         </p>
+        {cap.box_id && (
+          <button
+            className="move-target-btn"
+            style={{ marginBottom: "0.5rem" }}
+            onClick={() => onMove(cap.id, null, null, null)}
+          >
+            <span>Unbox (remove from box)</span>
+          </button>
+        )}
         <div className="move-target-list">
           {boxes
             .filter((b) => b.id !== cap.box_id)
