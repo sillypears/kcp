@@ -75,13 +75,60 @@ def read_keycaps(conn) -> List[dict]:
             k.sculpt,
             k.colorway,
             k.box_id,
-            b.label as box_label
+            b.label as box_label,
+            k.collab_id,
+            c.maker_name as collab_maker_name
         FROM keycaps k
         LEFT JOIN makers m ON m.id = k.maker_id
+        LEFT JOIN makers c ON c.id = k.collab_id
         LEFT JOIN boxes b ON b.id = k.box_id
         ORDER BY m.maker_name, k.sculpt
     """)
     return cur.fetchall()
+
+
+def build_collab_groups(keycaps: List[dict]) -> Dict[frozenset, set]:
+    pairs = set()
+    for cap in keycaps:
+        maker = cap.get("maker_name") or "Unknown Maker"
+        collab = cap.get("collab_maker_name")
+        if collab:
+            pairs.add(frozenset([maker, collab]))
+
+    parent = {}
+
+    def find(x):
+        if x not in parent:
+            parent[x] = x
+        if parent[x] != x:
+            parent[x] = find(parent[x])
+        return parent[x]
+
+    def union(x, y):
+        px, py = find(x), find(y)
+        if px != py:
+            parent[px] = py
+
+    for p in pairs:
+        members = list(p)
+        union(members[0], members[1])
+
+    groups = {}
+    for p in pairs:
+        for m in p:
+            root = find(m)
+            if root not in groups:
+                groups[root] = set()
+            groups[root].add(m)
+
+    return {frozenset(v): v for v in groups.values()}
+
+
+def get_maker_collabs(maker: str, collab_groups: Dict[frozenset, set]) -> set:
+    for group in collab_groups:
+        if maker in group:
+            return set(group)
+    return {maker}
 
 
 def get_maker_distribution(keycaps: List[dict]) -> Dict:
@@ -109,12 +156,19 @@ def get_maker_distribution(keycaps: List[dict]) -> Dict:
 
 
 def suggest_target_box(
-    maker: str, info: dict, dedicated: Dict, consolidation: str, boxes: list
+    maker: str,
+    info: dict,
+    dedicated: Dict,
+    consolidation: str,
+    boxes: list,
+    collab_groups: Dict[frozenset, set],
+    keycaps: List[dict],
 ) -> str:
     if maker in dedicated:
         return dedicated[maker]
 
-    # Filter to boxes that allow adding
+    maker_collabs = get_maker_collabs(maker, collab_groups)
+
     allow_add_boxes = {b["label"] for b in boxes if b.get("allow_add", True)}
 
     non_blank = {
@@ -122,6 +176,17 @@ def suggest_target_box(
     }
     if non_blank:
         return max(non_blank, key=non_blank.get)
+
+    for box in sorted(
+        allow_add_boxes,
+        key=lambda b: next((bb["capacity"] for bb in boxes if bb["label"] == b), 0),
+        reverse=True,
+    ):
+        box_caps = [c for c in keycaps if c.get("box_label") == box]
+        for cap in box_caps:
+            m = cap.get("maker_name") or "Unknown Maker"
+            if m in maker_collabs:
+                return box
 
     return consolidation
 
@@ -133,11 +198,14 @@ def generate_moves(
     consolidation: str,
     no_add: set,
     boxes: list,
+    collab_groups: Dict[frozenset, set],
 ) -> List[Dict]:
     moves = []
 
     for maker, info in maker_groups.items():
-        target = suggest_target_box(maker, info, dedicated, consolidation, boxes)
+        target = suggest_target_box(
+            maker, info, dedicated, consolidation, boxes, collab_groups, keycaps
+        )
 
         for current_box, count in info["distribution"].items():
             if current_box and current_box != target and current_box not in no_add:
@@ -226,12 +294,19 @@ def print_summary(
     consolidation: str,
     no_add: set,
     boxes: list,
+    collab_groups: Dict[frozenset, set],
 ):
     print(f"Total sculpts      : {len(keycaps)}")
     print(f"Total makers       : {len(maker_groups)}")
     print(f"Dedicated makers   : {len(dedicated)}")
     print(f"Consolidation box  : {consolidation}")
     print(f"Forbidden boxes    : {sorted(no_add)}")
+
+    print(f"\nCollab groups: {len(collab_groups)}")
+    for group in sorted(
+        collab_groups, key=lambda g: len(collab_groups[g]), reverse=True
+    ):
+        print(f"  {sorted(group)}")
 
     scattered = sorted(
         [
@@ -245,9 +320,16 @@ def print_summary(
 
     print("\n--- Top Scattered Makers ---")
     for maker, info in scattered:
-        target = suggest_target_box(maker, info, dedicated, consolidation, boxes)
+        target = suggest_target_box(
+            maker, info, dedicated, consolidation, boxes, collab_groups, keycaps
+        )
+        collab_info = ""
+        for g in collab_groups:
+            if maker in g and len(g) > 1:
+                collab_info = f" (collab with {sorted(g - {maker})})"
+                break
         print(
-            f"{maker:22} | {info['total']:2} caps | boxes: {info['boxes']} → **{target}**"
+            f"{maker:22} | {info['total']:2} caps | boxes: {info['boxes']} → **{target}**{collab_info}"
         )
 
     print("\n--- Recommended Moves ---")
@@ -298,9 +380,16 @@ def main(args):
 
         keycaps = read_keycaps(conn)
 
+        collab_groups = build_collab_groups(keycaps)
         maker_groups = get_maker_distribution(keycaps)
         moves = generate_moves(
-            keycaps, maker_groups, dedicated, consolidation, no_add_boxes, boxes
+            keycaps,
+            maker_groups,
+            dedicated,
+            consolidation,
+            no_add_boxes,
+            boxes,
+            collab_groups,
         )
 
         if args.visualize:
@@ -308,7 +397,14 @@ def main(args):
             return
 
         print_summary(
-            keycaps, maker_groups, moves, dedicated, consolidation, no_add_boxes, boxes
+            keycaps,
+            maker_groups,
+            moves,
+            dedicated,
+            consolidation,
+            no_add_boxes,
+            boxes,
+            collab_groups,
         )
 
         if moves:
