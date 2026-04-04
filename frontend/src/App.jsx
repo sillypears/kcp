@@ -43,6 +43,8 @@ function HomePage() {
   const [showAddMakerModal, setShowAddMakerModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const uniqueSculpts = [...new Set(keycaps.map((c) => c.sculpt).filter(Boolean))];
+
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
@@ -163,7 +165,7 @@ function HomePage() {
           <span className="highlight">{totalUsed}</span> / {totalCapacity} slots used
         </span>
         <span>
-          <span className="highlight">{keycaps.length}</span> keycaps
+          <span className="highlight">{uniqueSculpts.length}</span> sculpts
         </span>
         <span>
           <span className="highlight">{boxes.length}</span> boxes
@@ -435,16 +437,13 @@ function MakerPage() {
 
       <div className="status-bar">
         <span>
-          <span className="highlight">{keycaps.length}</span> total keycaps
+          <span className="highlight">{uniqueSculpts.length}</span> sculpts
         </span>
         <span>
           <span className="highlight">{boxed.length}</span> in boxes
         </span>
         <span>
           <span className="highlight">{unboxed.length}</span> unboxed
-        </span>
-        <span>
-          <span className="highlight">{uniqueSculpts.length}</span> unique sculpts
         </span>
       </div>
 
