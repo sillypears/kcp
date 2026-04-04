@@ -1,40 +1,69 @@
-CREATE TABLE `boxes` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `label` varchar(10) NOT NULL,
-  `name` varchar(100) DEFAULT NULL,
-  `maker_name` varchar(100) DEFAULT NULL,
-  `capacity` int(11) DEFAULT NULL,
-  `height` int(11) DEFAULT NULL,
-  `width` int(11) DEFAULT NULL,
-  `dedicated` tinyint(1) DEFAULT 0,
-  `allow_add` tinyint(1) DEFAULT 1,
-  `allow_duplicates` tinyint(1) DEFAULT 0,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `label` (`label`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+# Database Schema
 
-CREATE TABLE `makers` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `maker_name` varchar(255) NOT NULL,
-  `maker_name_clean` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `maker_name` (`maker_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=158 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+## Database: keyc (PostgreSQL)
 
-CREATE TABLE `keycaps` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `maker_id` int(11) DEFAULT NULL,
-  `cell_x` int(2) DEFAULT NULL,
-  `cell_y` int(2) DEFAULT NULL,
-  `sculpt` varchar(255) NOT NULL,
-  `sculpt_clean` varchar(45) DEFAULT NULL,
-  `colorway` varchar(255) DEFAULT NULL,
-  `box_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_cap` (`maker_id`,`sculpt`,`colorway`),
-  KEY `fk_keycap_box` (`box_id`),
-  CONSTRAINT `fk_keycap_box` FOREIGN KEY (`box_id`) REFERENCES `boxes` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `fk_keycap_maker` FOREIGN KEY (`maker_id`) REFERENCES `makers` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=597 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+## Table: boxes
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`blap`@`%` SQL SECURITY DEFINER VIEW `all_keycaps` AS select `k`.`id` AS `id`,`k`.`maker_id` AS `maker_id`,`m`.`maker_name` AS `maker_name`,`k`.`sculpt` AS `sculpt`,concat(`m`.`maker_name_clean`,replace(`k`.`sculpt`,' ','_')) AS `unique_id`,`k`.`colorway` AS `colorway`,`k`.`box_id` AS `box_id`,`b`.`label` AS `label` from ((`keycaps` `k` left join `makers` `m` on(`m`.`id` = `k`.`maker_id`)) left join `boxes` `b` on(`b`.`id` = `k`.`box_id`));
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | integer | PRIMARY KEY, DEFAULT nextval('boxes_id_seq') |
+| label | character varying(50) | NOT NULL, UNIQUE |
+| name | character varying(255) | |
+| maker_name | character varying(255) | |
+| capacity | integer | |
+| height | integer | DEFAULT 9 |
+| width | integer | DEFAULT 9 |
+| dedicated | boolean | DEFAULT false |
+| allow_add | boolean | DEFAULT true |
+| allow_duplicates | boolean | DEFAULT false |
+
+## Table: makers
+
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | integer | PRIMARY KEY, DEFAULT nextval('makers_id_seq') |
+| maker_name | character varying(255) | NOT NULL, UNIQUE |
+| maker_name_clean | character varying(255) | |
+| instagram | character varying(255) | |
+| city | character varying(100) | |
+| state | character varying(50) | |
+| country | character varying(10) | |
+| first_name | character varying(50) | |
+| state_code | character varying(3) | |
+
+## Table: keycaps
+
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | integer | PRIMARY KEY, DEFAULT nextval('keycaps_id_seq') |
+| maker_id | integer | FOREIGN KEY → makers(id) |
+| box_id | integer | FOREIGN KEY → boxes(id) |
+| cell_x | integer | |
+| cell_y | integer | |
+| sculpt | character varying(255) | NOT NULL |
+| sculpt_clean | character varying(255) | |
+| colorway | character varying(255) | |
+
+- Unique constraint on `(maker_id, sculpt, colorway)`
+
+## View: all_keycaps
+
+```sql
+SELECT 
+    k.id AS id,
+    k.maker_id AS maker_id,
+    m.maker_name AS maker_name,
+    k.collab_id AS collab_id,
+    c.maker_name AS collab_name,
+    k.sculpt AS sculpt,
+    CONCAT(m.maker_name_clean, REPLACE(k.sculpt, ' ', '_')) AS unique_id,
+    k.colorway AS colorway,
+    k.box_id AS box_id,
+    b.label AS label,
+    k.cell_x AS cell_x,
+    k.cell_y AS cell_y
+FROM keycaps k
+LEFT JOIN makers m ON m.id = k.maker_id
+LEFT JOIN makers c ON c.id = k.collab_id
+LEFT JOIN boxes b ON b.id = k.box_id;
+```

@@ -47,6 +47,12 @@ CREATE TABLE IF NOT EXISTS public.makers
     id integer NOT NULL DEFAULT nextval('makers_id_seq'::regclass),
     maker_name character varying(255) COLLATE pg_catalog."default" NOT NULL,
     maker_name_clean character varying(255) COLLATE pg_catalog."default",
+    instagram character varying(255) COLLATE pg_catalog."default",
+    city character varying(100) COLLATE pg_catalog."default",
+    state character varying(50) COLLATE pg_catalog."default",
+    country character varying(10) COLLATE pg_catalog."default",
+    first_name character varying(50) COLLATE pg_catalog."default",
+    state_code character varying(3) COLLATE pg_catalog."default",
     CONSTRAINT makers_pkey PRIMARY KEY (id),
     CONSTRAINT makers_maker_name_key UNIQUE (maker_name)
 )
@@ -64,6 +70,7 @@ CREATE TABLE IF NOT EXISTS public.keycaps
 (
     id integer NOT NULL DEFAULT nextval('keycaps_id_seq'::regclass),
     maker_id integer,
+    collab_id integer,
     box_id integer,
     cell_x integer,
     cell_y integer,
@@ -77,6 +84,10 @@ CREATE TABLE IF NOT EXISTS public.keycaps
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
     CONSTRAINT keycaps_maker_id_fkey FOREIGN KEY (maker_id)
+        REFERENCES public.makers (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT keycaps_collab_id_fkey FOREIGN KEY (collab_id)
         REFERENCES public.makers (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION

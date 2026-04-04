@@ -13,19 +13,21 @@ All tables use `id` as auto-increment PK (NOT `box_id`/`keycap_id`/`maker_id`).
 
 ### `boxes`
 - `id`, `label` (unique), `name`, `maker_name`, `capacity`, `height`, `width`
-- `dedicated` (tinyint), `allow_add` (tinyint), `allow_duplicates` (tinyint)
+- `dedicated` (boolean), `allow_add` (boolean), `allow_duplicates` (boolean)
 
 ### `makers`
 - `id`, `maker_name` (unique), `maker_name_clean`
+- `instagram`, `city`, `state`, `country`, `first_name`, `state_code`
 
 ### `keycaps`
 - `id`, `maker_id` (FK→makers.id), `box_id` (FK→boxes.id)
+- `collab_id` (FK→makers.id) — collaborator maker
 - `cell_x` (int), `cell_y` (int) — grid position within box
 - `sculpt`, `sculpt_clean`, `colorway`
 - Unique constraint on `(maker_id, sculpt, colorway)`
 
 ### `all_keycaps` (view)
-- Joins keycaps + makers + boxes, returns `id`, `maker_name`, `sculpt`, `unique_id`, `colorway`, `box_id`, `label`
+- Joins keycaps + makers + boxes, returns `id`, `maker_id`, `maker_name`, `collab_id`, `collab_name`, `sculpt`, `unique_id`, `colorway`, `box_id`, `label`, `cell_x`, `cell_y`
 
 ## File Structure
 ```
