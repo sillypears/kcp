@@ -69,6 +69,46 @@ export async function fetchMakers() {
   return res.json();
 }
 
+export async function createMaker(data) {
+  const res = await fetch(`${API}/api/makers/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to create maker");
+  return res.json();
+}
+
+export async function deleteMaker(id) {
+  const res = await fetch(`${API}/api/makers/${id}`, { method: "DELETE" });
+  if (!res.ok) throw new Error("Failed to delete maker");
+}
+
+export async function createBox(data) {
+  const res = await fetch(`${API}/api/boxes/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to create box");
+  return res.json();
+}
+
+export async function updateBox(id, data) {
+  const res = await fetch(`${API}/api/boxes/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update box");
+  return res.json();
+}
+
+export async function deleteBox(id) {
+  const res = await fetch(`${API}/api/boxes/${id}`, { method: "DELETE" });
+  if (!res.ok) throw new Error("Failed to delete box");
+}
+
 export async function fetchBoxInventory() {
   const res = await fetch(`${API}/api/stats/box-inventory`);
   if (!res.ok) throw new Error("Failed to fetch inventory");

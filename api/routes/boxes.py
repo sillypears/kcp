@@ -41,8 +41,8 @@ def create_box(data: BoxCreate, db: psycopg2.extensions.connection = Depends(get
     cur = db.cursor(cursor_factory=RealDictCursor)
     cur.execute(
         """
-        INSERT INTO boxes (label, name, maker_name, capacity, height, width, dedicated, allow_add)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO boxes (label, name, maker_name, capacity, height, width, dedicated, allow_add, allow_duplicates)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id
     """,
         (
@@ -54,6 +54,7 @@ def create_box(data: BoxCreate, db: psycopg2.extensions.connection = Depends(get
             data.width,
             data.dedicated,
             data.allow_add,
+            data.allow_duplicates,
         ),
     )
     new_id = cur.fetchone()["id"]

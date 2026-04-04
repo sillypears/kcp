@@ -35,11 +35,20 @@ def create_maker(
     try:
         cur.execute(
             """
-            INSERT INTO makers (maker_name, maker_name_clean)
-            VALUES (%s, %s)
+            INSERT INTO makers (maker_name, maker_name_clean, instagram, city, state, country, first_name, state_code)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id
         """,
-            (data.maker_name, data.maker_name_clean),
+            (
+                data.maker_name,
+                data.maker_name_clean,
+                data.instagram,
+                data.city,
+                data.state,
+                data.country,
+                data.first_name,
+                data.state_code,
+            ),
         )
         new_id = cur.fetchone()["id"]
         db.commit()

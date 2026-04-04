@@ -45,6 +45,12 @@ class MoveKeycap(BaseModel):
 class MakerBase(BaseModel):
     maker_name: str
     maker_name_clean: Optional[str] = None
+    instagram: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    country: Optional[str] = None
+    first_name: Optional[str] = None
+    state_code: Optional[str] = None
 
 
 class MakerCreate(MakerBase):
@@ -66,6 +72,7 @@ class BoxBase(BaseModel):
     width: Optional[int] = None
     dedicated: bool = False
     allow_add: bool = True
+    allow_duplicates: bool = False
 
 
 class BoxCreate(BoxBase):
