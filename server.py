@@ -17,7 +17,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="Artisan Whisperer", lifespan=lifespan)
+app = FastAPI(title="Waste of Time Backend", lifespan=lifespan)
 
 app.include_router(keycaps.router)
 app.include_router(boxes.router)
