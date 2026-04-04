@@ -222,5 +222,6 @@ lib64
 
 .env
 boxes.json
+AGENTS.md
 *.csv
 !output.csv
