@@ -33,6 +33,7 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
+  padding-bottom: 2rem;
 }
 
 .app-header {
@@ -426,4 +427,33 @@ body {
     grid-template-columns: 1fr;
     padding: 1rem;
   }
+}
+
+.app-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.5rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  text-align: center;
+  z-index: 10;
+}
+
+.app-footer a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.app-footer a:hover {
+  color: var(--accent);
+}
+
+.app-footer a:hover svg {
+  fill: var(--accent);
 }
