@@ -31,6 +31,7 @@ class KeycapResponse(KeycapBase):
     maker_name: Optional[str] = None
     collab_name: Optional[str] = None
     label: Optional[str] = None
+    unique_id: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

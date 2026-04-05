@@ -43,7 +43,7 @@ function HomePage() {
   const [showAddMakerModal, setShowAddMakerModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const uniqueSculpts = [...new Set(keycaps.map((c) => c.sculpt).filter(Boolean))];
+  const uniqueSculpts = [...new Set(keycaps.map((c) => c.unique_id).filter(Boolean))];
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -411,7 +411,7 @@ function MakerPage() {
   const unboxed = keycaps.filter((c) => !c.box_id);
   const boxed = keycaps.filter((c) => c.box_id);
 
-  const uniqueSculpts = [...new Set(keycaps.map((c) => c.sculpt).filter(Boolean))];
+  const uniqueSculpts = [...new Set(keycaps.map((c) => c.unique_id).filter(Boolean))];
 
   return (
     <>
