@@ -70,9 +70,15 @@ function HomePage() {
   }, [loadData]);
 
   const handleMove = async (keycapId, targetBoxId, cellX, cellY) => {
-    await moveKeycap(keycapId, targetBoxId, cellX, cellY);
+    setKeycaps((prev) =>
+      prev.map((k) =>
+        k.id === keycapId
+          ? { ...k, box_id: targetBoxId, cell_x: cellX, cell_y: cellY, label: targetBoxId ? boxes.find((b) => b.id === targetBoxId)?.label : null }
+          : k
+      )
+    );
     setMovingCap(null);
-    loadData();
+    await moveKeycap(keycapId, targetBoxId, cellX, cellY);
   };
 
   const handleAdd = async (data) => {
