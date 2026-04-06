@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import List, Optional
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from datetime import datetime
 
 from api.database import get_db
 from api.schemas import KeycapResponse, KeycapCreate, KeycapUpdate, MoveKeycap
@@ -52,8 +53,8 @@ def create_keycap(
     cur = db.cursor(cursor_factory=RealDictCursor)
     cur.execute(
         """
-        INSERT INTO keycaps (maker_id, collab_id, box_id, cell_x, cell_y, sculpt, colorway)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO keycaps (maker_id, collab_id, box_id, cell_x, cell_y, sculpt, sculpt_clean, colorway, date_won, date_received, date_sold, keep_forever)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id
     """,
         (
@@ -63,7 +64,12 @@ def create_keycap(
             data.cell_x,
             data.cell_y,
             data.sculpt,
+            data.sculpt_clean,
             data.colorway,
+            data.date_won,
+            data.date_received,
+            data.date_sold,
+            data.keep_forever,
         ),
     )
     new_id = cur.fetchone()["id"]
@@ -91,7 +97,12 @@ def update_keycap(
         "cell_x",
         "cell_y",
         "sculpt",
+        "sculpt_clean",
         "colorway",
+        "date_won",
+        "date_received",
+        "date_sold",
+        "keep_forever",
     ]:
         val = getattr(data, field)
         if val is not None:

@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional
+from datetime import datetime
 
 
 class KeycapBase(BaseModel):
@@ -9,7 +10,12 @@ class KeycapBase(BaseModel):
     cell_x: Optional[int] = None
     cell_y: Optional[int] = None
     sculpt: str
+    sculpt_clean: Optional[str] = None
     colorway: Optional[str] = None
+    date_won: Optional[datetime] = None
+    date_received: Optional[datetime] = None
+    date_sold: Optional[datetime] = None
+    keep_forever: Optional[bool] = False
 
 
 class KeycapCreate(KeycapBase):
@@ -23,7 +29,12 @@ class KeycapUpdate(BaseModel):
     cell_x: Optional[int] = None
     cell_y: Optional[int] = None
     sculpt: Optional[str] = None
+    sculpt_clean: Optional[str] = None
     colorway: Optional[str] = None
+    date_won: Optional[datetime] = None
+    date_received: Optional[datetime] = None
+    date_sold: Optional[datetime] = None
+    keep_forever: Optional[bool] = None
 
 
 class KeycapResponse(KeycapBase):

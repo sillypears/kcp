@@ -77,6 +77,10 @@ CREATE TABLE IF NOT EXISTS public.keycaps
     sculpt character varying(255) COLLATE pg_catalog."default",
     sculpt_clean character varying(255) COLLATE pg_catalog."default",
     colorway character varying(255) COLLATE pg_catalog."default",
+    date_won date,
+    date_received date,
+    date_sold date,
+    keep_forever boolean DEFAULT false,
     CONSTRAINT keycaps_pkey PRIMARY KEY (id),
     CONSTRAINT keycaps_maker_id_sculpt_colorway_key UNIQUE (maker_id, sculpt, colorway),
     CONSTRAINT keycaps_box_id_fkey FOREIGN KEY (box_id)
@@ -106,12 +110,17 @@ SELECT
     k.collab_id AS collab_id,
     c.maker_name AS collab_name,
     k.sculpt AS sculpt,
+    k.sculpt_clean AS sculpt_clean,
     CONCAT(m.maker_name_clean, REPLACE(k.sculpt, ' ', '_')) AS unique_id,
     k.colorway AS colorway,
     k.box_id AS box_id,
     b.label AS "label",
     k.cell_x AS cell_x,
-    k.cell_y AS cell_y
+    k.cell_y AS cell_y,
+    k.date_won AS date_won,
+    k.date_received AS date_received,
+    k.date_sold AS date_sold,
+    k.keep_forever AS keep_forever
 FROM keycaps k
 LEFT JOIN makers m ON m.id = k.maker_id
 LEFT JOIN makers c on c.id = k.collab_id
