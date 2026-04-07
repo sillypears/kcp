@@ -74,6 +74,32 @@ body {
   border-color: var(--accent);
 }
 
+.search-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.search-wrapper .search-input {
+  padding-right: 2rem;
+}
+
+.search-clear {
+  position: absolute;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  line-height: 1;
+}
+
+.search-clear:hover {
+  color: var(--text);
+}
+
 .btn {
   padding: 0.5rem 1rem;
   border: none;

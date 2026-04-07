@@ -29,18 +29,14 @@ export function HomePage() {
   const [showAddMakerModal, setShowAddMakerModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const uniqueSculpts = [...new Set(keycaps.map((c) => c.unique_id).filter(Boolean))];
-
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [caps, boxList, makerList, inv] = await Promise.all([
-        fetchKeycaps(search ? { search } : {}),
+      const [boxList, makerList, inv] = await Promise.all([
         fetchBoxes(),
         fetchMakers(),
         fetchBoxInventory(),
       ]);
-      setKeycaps(caps);
       setBoxes(boxList);
       setMakers(makerList);
       setInventory(inv);
@@ -49,11 +45,27 @@ export function HomePage() {
     } finally {
       setLoading(false);
     }
-  }, [search]);
+  }, []);
+
+  const loadKeycaps = useCallback(async (searchTerm) => {
+    try {
+      const caps = await fetchKeycaps(searchTerm ? { search: searchTerm } : {});
+      setKeycaps(caps);
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      loadKeycaps(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search, loadKeycaps]);
 
   const handleMove = async (keycapId, targetBoxId, cellX, cellY) => {
     setKeycaps((prev) =>
@@ -108,6 +120,7 @@ export function HomePage() {
   const totalCapacity = inventory.reduce((s, b) => s + (b.capacity || 0), 0);
   const totalUsed = inventory.reduce((s, b) => s + (b.current_count || 0), 0);
   const unboxed = keycaps.filter((c) => !c.box_id);
+  const filteredUniqueSculpts = [...new Set(keycaps.map((c) => c.unique_id).filter(Boolean))];
 
   if (loading) {
     return <div style={{ padding: "2rem", textAlign: "center" }}>Loading...</div>;
@@ -118,14 +131,24 @@ export function HomePage() {
       <header className="app-header">
         <h1>Waste of Time</h1>
         <div className="header-controls">
-          <input
-            className="search-input"
-            placeholder="Search maker, sculpt, colorway..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && setSearch(searchInput)}
-          />
-          <button className="btn" onClick={() => setSearch(searchInput)}>Search</button>
+          <div className="search-wrapper">
+            <input
+              className="search-input"
+              placeholder="Search maker, sculpt, colorway..."
+              value={searchInput}
+              onChange={(e) => { setSearchInput(e.target.value); setSearch(e.target.value); }}
+              onKeyDown={(e) => e.key === "Enter" && setSearch(searchInput)}
+            />
+            {searchInput && (
+              <button
+                className="search-clear"
+                onClick={() => { setSearchInput(""); setSearch(""); }}
+                title="Clear search"
+              >
+                ×
+              </button>
+            )}
+          </div>
           <button className="btn btn-secondary" onClick={() => setShowAddBoxModal(true)}>
             + Add Box
           </button>
@@ -139,7 +162,7 @@ export function HomePage() {
       </header>
 
       <div className="status-bar">
-        <span><span className="highlight">{uniqueSculpts.length}</span> sculpts</span>
+        <span><span className="highlight">{filteredUniqueSculpts.length}</span> sculpts</span>
         <span>{totalUsed}/{totalCapacity} slots used</span>
         <span><span className="highlight">{boxes.length}</span> boxes</span>
         {unboxed.length > 0 && (
