@@ -32,6 +32,9 @@ def create_maker(
     data: MakerCreate, db: psycopg2.extensions.connection = Depends(get_db)
 ):
     cur = db.cursor(cursor_factory=RealDictCursor)
+    cur.execute("SELECT id FROM makers WHERE maker_name = %s", (data.maker_name,))
+    if cur.fetchone():
+        raise HTTPException(status_code=409, detail="Maker already exists")
     try:
         cur.execute(
             """
