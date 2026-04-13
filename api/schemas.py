@@ -63,7 +63,8 @@ class MakerBase(BaseModel):
     country: Optional[str] = None
     first_name: Optional[str] = None
     state_code: Optional[str] = None
-
+    keycap_archivist_id: Optional[str] = None
+    keycap_archivist_name: Optional[str] = None
 
 class MakerCreate(MakerBase):
     pass

@@ -70,6 +70,18 @@ export function MakerPage() {
               </svg>
             </a>
           )}
+          {maker?.keycap_archivist_name && (
+            <a
+              href={`https://keycap-archivist.com/maker/${maker.keycap_archivist_name.replace('@', '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="social-link"
+            >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M5 4v16h4v-7l6 7h5l-7-8 7-8h-5l-6 7V4H5z" />
+            </svg>
+            </a>
+          )}
         </div>
       </header>
 
