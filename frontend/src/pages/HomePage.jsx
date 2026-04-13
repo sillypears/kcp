@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { KeycapModal, MoveModal, AddModal, AddBoxModal, AddMakerModal } from "../components/Modals";
+import { Footer } from "../components/Footer";
 import {
   fetchKeycaps,
   fetchBoxes,
@@ -352,6 +353,8 @@ export function HomePage() {
           onAdd={handleAddMaker}
         />
       )}
+
+      <Footer />
     </>
   );
 }
