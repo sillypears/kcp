@@ -17,7 +17,12 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="Waste of Time Backend", lifespan=lifespan)
+app = FastAPI(
+    title="Waste of Time Backend",
+    lifespan=lifespan,
+    docs_url="/docs",
+    redoc_url="/redoc",
+)
 
 app.include_router(keycaps.router)
 app.include_router(boxes.router)
