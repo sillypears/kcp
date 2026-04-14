@@ -38,8 +38,8 @@ def create_maker(
     try:
         cur.execute(
             """
-            INSERT INTO makers (maker_name, maker_name_clean, instagram, city, state, country, first_name, state_code)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO makers (maker_name, maker_name_clean, instagram, city, state, country, first_name, state_code, keycap_archivist_id, keycap_archivist_name)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id
         """,
             (
@@ -51,6 +51,8 @@ def create_maker(
                 data.country,
                 data.first_name,
                 data.state_code,
+                data.keycap_archivist_id,
+                data.keycap_archivist_name,
             ),
         )
         new_id = cur.fetchone()["id"]

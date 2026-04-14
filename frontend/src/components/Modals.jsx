@@ -480,6 +480,20 @@ export function AddMakerModal({ onClose, onAdd }) {
               onChange={(e) => setForm({ ...form, country: e.target.value })}
             />
           </div>
+          <div className="form-group">
+            <label>Archivist ID</label>
+            <input
+              value={form.keycap_archivist_id}
+              onChange={(e) => setForm({ ...form, keycap_archivist_id: e.target.value })}
+            />
+          </div>
+          <div className="form-group">
+            <label>Archivist Name</label>
+            <input
+              value={form.keycap_archivist_name}
+              onChange={(e) => setForm({ ...form, keycap_archivist_name: e.target.value })}
+            />
+          </div>
           <div className="modal-actions">
             <button type="button" className="btn btn-secondary" onClick={onClose}>
               Cancel
