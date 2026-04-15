@@ -7,7 +7,10 @@ import { Footer } from "../components/Footer";
 export function BoxPage() {
   const { boxId } = useParams();
   const [box, setBox] = useState(null);
+  const [boxes, setBoxes] = useState([]);
+  const [makers, setMakers] = useState([]);
   const [keycaps, setKeycaps] = useState([]);
+  const [selectedCap, setSelectedCap] = useState(null);
   const [movingCap, setMovingCap] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -15,11 +18,15 @@ export function BoxPage() {
     async function loadData() {
       setLoading(true);
       try {
-        const [boxData, caps] = await Promise.all([
+        const [boxData, caps, boxList, makerList] = await Promise.all([
           fetch(`/api/boxes/${boxId}`).then((r) => r.json()),
           fetchKeycaps({ box_id: Number(boxId) }),
+          fetchBoxes(),
+          fetchMakers(),
         ]);
         setBox(boxData);
+        setBoxes(boxList);
+        setMakers(makerList);
         setKeycaps(caps);
       } catch (e) {
         console.error(e);
@@ -29,6 +36,28 @@ export function BoxPage() {
     }
     loadData();
   }, [boxId]);
+
+  const handleDelete = async (id) => {
+    if (confirm("Delete this keycap?")) {
+      await deleteKeycap(id);
+      setSelectedCap(null);
+      const caps = await fetchKeycaps({ box_id: Number(boxId) });
+      setKeycaps(caps);
+    }
+  };
+
+  const handleEdit = async (id, data) => {
+    const cleaned = {
+      ...data,
+      maker_id: data.maker_id || null,
+      collab_id: data.collab_id === "" ? null : data.collab_id,
+      box_id: data.box_id || null,
+    };
+    await updateKeycap(id, cleaned);
+    setSelectedCap(null);
+    const caps = await fetchKeycaps({ box_id: Number(boxId) });
+    setKeycaps(caps);
+  };
 
   const handleMove = async (keycapId, targetBoxId, cellX, cellY) => {
     setKeycaps((prev) =>
@@ -53,7 +82,7 @@ export function BoxPage() {
 
   const capAt = (x, y) => keycaps.find((c) => c.cell_x === x && c.cell_y === y);
 
-  const makers = [...new Set(keycaps.map((c) => c.maker_name).filter(Boolean))];
+  const uniqueMakers = [...new Set(keycaps.map((c) => c.maker_name).filter(Boolean))];
 
   return (
     <>
@@ -75,7 +104,7 @@ export function BoxPage() {
           <span>Maker: <span className="highlight">{box.maker_name}</span></span>
         )}
         <span>
-          <span className="highlight">{makers.length}</span> makers represented
+          <span className="highlight">{uniqueMakers.length}</span> makers represented
         </span>
         {movingCap && (
           <span className="highlight">Moving: {movingCap.sculpt}</span>
@@ -89,7 +118,7 @@ export function BoxPage() {
               Array.from({ length: width }).map((_, x) => {
                 const cap = capAt(x, y);
                 const isEmpty = !cap;
-                const isSelected = movingCap?.id === cap?.id;
+                const isSelected = movingCap?.id === cap?.id || selectedCap?.id === cap?.id;
 
                 return (
                   <div
@@ -115,6 +144,8 @@ export function BoxPage() {
                     onClick={() => {
                       if (movingCap && isEmpty) {
                         handleMove(movingCap.id, Number(boxId), x, y);
+                      } else if (!isEmpty && !movingCap) {
+                        setSelectedCap(cap);
                       }
                     }}
                   >
@@ -150,7 +181,7 @@ export function BoxPage() {
             </div>
             <div className="stat-item">
               <span className="stat-label">Makers</span>
-              <span className="stat-value">{makers.length}</span>
+              <span className="stat-value">{uniqueMakers.length}</span>
             </div>
             {box?.dedicated !== undefined && (
               <div className="stat-item">
@@ -171,7 +202,7 @@ export function BoxPage() {
           <h3>Keycaps in this box</h3>
           <div className="keycap-list">
             {keycaps.map((cap) => (
-              <div key={cap.id} className="keycap-list-item">
+              <div key={cap.id} className="keycap-list-item" onClick={() => setSelectedCap(cap)}>
                 <Link to={`/maker/${cap.maker_id}`} className="maker-link">{cap.maker_name}</Link>
                 <span className="sculpt">{cap.sculpt}</span>
                 {cap.collab_name && <span className="collab">x {cap.collab_name}</span>}
@@ -185,6 +216,21 @@ export function BoxPage() {
           </div>
         </div>
       </div>
+
+      {selectedCap && (
+        <KeycapModal
+          cap={selectedCap}
+          boxes={boxes}
+          makers={makers}
+          onClose={() => setSelectedCap(null)}
+          onDelete={handleDelete}
+          onEdit={handleEdit}
+          onMove={() => {
+            setMovingCap(selectedCap);
+            setSelectedCap(null);
+          }}
+        />
+      )}
 
       <Footer />
     </>
