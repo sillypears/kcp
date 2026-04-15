@@ -200,10 +200,10 @@ export function BoxPage() {
                 <span className="stat-value">{box.dedicated ? "Yes" : "No"}</span>
               </div>
             )}
-            {box?.dupes !== undefined && (
+            {box?.duplicates !== undefined && (
               <div className="stat-item">
                 <span className="stat-label">Allow Dupes</span>
-                <span className="stat-value">{box.dupes ? "Yes" : "No"}</span>
+                <span className="stat-value">{box.duplicates ? "Yes" : "No"}</span>
               </div>
             )}
             {box?.allow_add !== undefined && (
