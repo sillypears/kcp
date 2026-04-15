@@ -233,6 +233,7 @@ export function AddModal({ boxes, makers, keycaps, onClose, onAdd }) {
             <label>Sculpt *</label>
             <input
               required
+              autoFocus
               value={form.sculpt}
               onChange={(e) => setForm({ ...form, sculpt: e.target.value })}
             />
