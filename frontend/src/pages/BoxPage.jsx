@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { fetchKeycaps } from "../api";
+import { fetchKeycaps, moveKeycap } from "../api";
 import { Footer } from "../components/Footer";
 
 export function BoxPage() {
   const { boxId } = useParams();
   const [box, setBox] = useState(null);
   const [keycaps, setKeycaps] = useState([]);
+  const [movingCap, setMovingCap] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,6 +28,18 @@ export function BoxPage() {
     }
     loadData();
   }, [boxId]);
+
+  const handleMove = async (keycapId, targetBoxId, cellX, cellY) => {
+    setKeycaps((prev) =>
+      prev.map((k) =>
+        k.id === keycapId
+          ? { ...k, box_id: targetBoxId, cell_x: cellX, cell_y: cellY }
+          : k
+      )
+    );
+    setMovingCap(null);
+    await moveKeycap(keycapId, targetBoxId, cellX, cellY);
+  };
 
   if (loading) {
     return <div style={{ padding: "2rem", textAlign: "center" }}>Loading...</div>;
@@ -63,6 +76,9 @@ export function BoxPage() {
         <span>
           <span className="highlight">{makers.length}</span> makers represented
         </span>
+        {movingCap && (
+          <span className="highlight">Moving: {movingCap.sculpt}</span>
+        )}
       </div>
 
       <div className="box-detail-layout">
@@ -71,13 +87,37 @@ export function BoxPage() {
             {Array.from({ length: height }).map((_, y) =>
               Array.from({ length: width }).map((_, x) => {
                 const cap = capAt(x, y);
+                const isEmpty = !cap;
+                const isSelected = movingCap?.id === cap?.id;
+
                 return (
                   <div
                     key={`${x}-${y}`}
-                    className={`keycap-cell${!cap ? " empty" : " filled"}`}
-                    title={cap ? `ID: ${cap.id}\nMaker: ${cap.maker_name}${cap.collab_name ? ' x ' + cap.collab_name : ''}\nSculpt: ${cap.sculpt}\nColorway: ${cap.colorway || '—'}\nPosition: (${cap.cell_x}, ${cap.cell_y})` : `Empty cell (${x}, ${y})`}
+                    className={`keycap-cell${isEmpty ? " empty" : " filled"}${isSelected ? " selected" : ""}`}
+                    title={!isEmpty ? `ID: ${cap.id}\nMaker: ${cap.maker_name}${cap.collab_name ? ' x ' + cap.collab_name : ''}\nSculpt: ${cap.sculpt}\nColorway: ${cap.colorway || '—'}\nPosition: (${cap.cell_x}, ${cap.cell_y})` : `Empty cell (${x}, ${y})`}
+                    draggable={!isEmpty}
+                    onDragStart={(e) => {
+                      if (!isEmpty) {
+                        e.dataTransfer.setData("text/plain", cap.id);
+                        setMovingCap(cap);
+                      }
+                    }}
+                    onDragOver={(e) => {
+                      if (movingCap && isEmpty) e.preventDefault();
+                    }}
+                    onDrop={(e) => {
+                      if (movingCap && isEmpty) {
+                        e.preventDefault();
+                        handleMove(movingCap.id, Number(boxId), x, y);
+                      }
+                    }}
+                    onClick={() => {
+                      if (movingCap && isEmpty) {
+                        handleMove(movingCap.id, Number(boxId), x, y);
+                      }
+                    }}
                   >
-                    {cap ? (
+                    {!isEmpty ? (
                       <>
                         <Link to={`/maker/${cap.maker_id}`} className="maker-link" onClick={(e) => e.stopPropagation()}>
                           {cap.maker_name?.split(" ")[0]}
