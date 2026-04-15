@@ -335,6 +335,7 @@ export function HomePage() {
         <AddModal
           boxes={boxes}
           makers={makers}
+          keycaps={keycaps}
           onClose={() => setShowAddModal(false)}
           onAdd={handleAdd}
         />

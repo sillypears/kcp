@@ -190,17 +190,37 @@ export function MoveModal({ cap, boxes, inventory, onClose, onMove }) {
   );
 }
 
-export function AddModal({ boxes, makers, onClose, onAdd }) {
+export function AddModal({ boxes, makers, keycaps, onClose, onAdd }) {
   const [form, setForm] = useState({ sculpt: "", colorway: "", maker_id: "", collab_id: "", box_id: "" });
+
+  const findFirstEmptyCell = (boxId) => {
+    if (!boxId || !keycaps) return { cell_x: 0, cell_y: 0 };
+    const box = boxes.find((b) => b.id === boxId);
+    if (!box) return { cell_x: 0, cell_y: 0 };
+    const width = box.width || 9;
+    const height = box.height || 9;
+    const boxKeycaps = keycaps.filter((k) => k.box_id === boxId);
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const occupied = boxKeycaps.some((k) => k.cell_x === x && k.cell_y === y);
+        if (!occupied) return { cell_x: x, cell_y: y };
+      }
+    }
+    return { cell_x: 0, cell_y: 0 };
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const boxId = form.box_id ? Number(form.box_id) : null;
+    const cell = boxId ? findFirstEmptyCell(boxId) : { cell_x: null, cell_y: null };
     onAdd({
       sculpt: form.sculpt,
       colorway: form.colorway || null,
       maker_id: form.maker_id ? Number(form.maker_id) : null,
       collab_id: form.collab_id ? Number(form.collab_id) : null,
-      box_id: form.box_id ? Number(form.box_id) : null,
+      box_id: boxId,
+      cell_x: cell.cell_x,
+      cell_y: cell.cell_y,
     });
   };
 
