@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { KeycapModal } from "../components/Modals";
-import { fetchKeycaps, fetchBoxes, fetchMakers, moveKeycap, updateKeycap, deleteKeycap } from "../api";
+import { KeycapModal, AddModal } from "../components/Modals";
+import { fetchKeycaps, fetchBoxes, fetchMakers, moveKeycap, updateKeycap, deleteKeycap, createKeycap } from "../api";
 import { Footer } from "../components/Footer";
 
 export function BoxPage() {
@@ -12,6 +12,7 @@ export function BoxPage() {
   const [keycaps, setKeycaps] = useState([]);
   const [selectedCap, setSelectedCap] = useState(null);
   const [movingCap, setMovingCap] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -59,6 +60,13 @@ export function BoxPage() {
     setKeycaps(caps);
   };
 
+  const handleAdd = async (data) => {
+    await createKeycap(data);
+    setShowAddModal(false);
+    const caps = await fetchKeycaps({ box_id: Number(boxId) });
+    setKeycaps(caps);
+  };
+
   const handleMove = async (keycapId, targetBoxId, cellX, cellY) => {
     setKeycaps((prev) =>
       prev.map((k) =>
@@ -93,6 +101,9 @@ export function BoxPage() {
           <span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>
             {height} rows × {width} cols
           </span>
+          <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+            + Add Keycap
+          </button>
         </div>
       </header>
 
@@ -229,6 +240,15 @@ export function BoxPage() {
             setMovingCap(selectedCap);
             setSelectedCap(null);
           }}
+        />
+      )}
+
+      {showAddModal && (
+        <AddModal
+          boxes={boxes}
+          makers={makers}
+          onClose={() => setShowAddModal(false)}
+          onAdd={handleAdd}
         />
       )}
 
