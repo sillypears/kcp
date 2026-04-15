@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { fetchKeycaps, moveKeycap } from "../api";
+import { KeycapModal } from "../components/Modals";
+import { fetchKeycaps, fetchBoxes, fetchMakers, moveKeycap, updateKeycap, deleteKeycap } from "../api";
 import { Footer } from "../components/Footer";
 
 export function BoxPage() {
