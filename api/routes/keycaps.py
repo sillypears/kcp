@@ -29,7 +29,7 @@ def list_keycaps(
         query += " AND (sculpt LIKE %s OR maker_name LIKE %s OR colorway LIKE %s)"
         like = f"%{search}%"
         params.extend([like, like, like])
-    query += " ORDER BY maker_name, sculpt"
+    query += " ORDER BY id DESC, maker_name ASC, sculpt ASC"
 
     cur = db.cursor(cursor_factory=RealDictCursor)
     cur.execute(query, params)
