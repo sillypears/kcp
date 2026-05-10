@@ -3,12 +3,17 @@ import { Link, useParams } from "react-router-dom";
 import { fetchKeycaps, fetchBoxes } from "../api";
 import { Footer } from "../components/Footer";
 
-function CountryFlag({ code }) {
+function CountryFlag({ code, countryName }) {
   const codePoints = code
     .toUpperCase()
     .split("")
     .map((char) => 127397 + char.charCodeAt(0));
-  return <span>{String.fromCodePoint(...codePoints)}</span>;
+  const name = countryName || new Intl.DisplayNames([navigator.language || "en"], { type: "region" }).of(code) || code;
+  return (
+    <span className="country-flag" title={name}>
+      {String.fromCodePoint(...codePoints)}
+    </span>
+  );
 }
 
 export function MakerPage() {
@@ -159,6 +164,36 @@ export function MakerPage() {
                 {cap.colorway && <span className="colorway">{cap.colorway}</span>}
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {uniqueSculpts.length > 0 && (
+        <div className="sculpt-list-section">
+          <div className="section-header">
+            <h2>Sculpts</h2>
+          </div>
+          <div className="sculpt-list">
+            {uniqueSculpts.map((uid) => {
+              const caps = keycaps.filter((c) => c.unique_id === uid);
+              const firstCap = caps[0];
+              const collabName = firstCap.collab_name;
+              const locations = caps.map((c) => {
+                if (!c.box_id) return "Unboxed";
+                return `${c.label || "Box"} (${c.cell_x},${c.cell_y})`;
+              });
+              return (
+                <div key={uid} className="sculpt-row">
+                  <div className="sculpt-name-col">
+                    <span className="sculpt-name">{firstCap.sculpt}</span>
+                    {collabName && <span className="sculpt-collab">× {collabName}</span>}
+                  </div>
+                  <span className="sculpt-colorway">{firstCap.colorway || ""}</span>
+                  <span className="sculpt-locations">{locations.join(", ")}</span>
+                  <span className="sculpt-count">×{caps.length}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

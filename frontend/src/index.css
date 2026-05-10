@@ -184,6 +184,96 @@ body {
   cursor: grabbing;
 }
 
+.sculpt-list-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  margin: 1.5rem 1.5rem 0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.sculpt-list-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--border);
+}
+
+.sculpt-list-section .section-header h2 {
+  font-size: 1rem;
+  color: var(--accent);
+}
+
+.sculpt-list {
+  padding: 0.5rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.sculpt-row {
+  display: grid;
+  grid-template-columns: 180px 1fr 1fr 50px;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.sculpt-row:last-child {
+  border-bottom: none;
+}
+
+.sculpt-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sculpt-name-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.sculpt-name {
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sculpt-collab {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sculpt-colorway {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sculpt-locations {
+  color: var(--accent);
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sculpt-count {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  text-align: right;
+}
+
 .boxes-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
