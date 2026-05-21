@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { KeycapModal, AddModal } from "../components/Modals";
 import { fetchKeycaps, fetchBoxes, fetchMakers, moveKeycap, updateKeycap, deleteKeycap, createKeycap } from "../api";
 import { Footer } from "../components/Footer";
+import { StatusBar } from "../components/StatusBar";
 
 export function BoxPage() {
   const { boxId } = useParams();
@@ -107,20 +108,7 @@ export function BoxPage() {
         </div>
       </header>
 
-      <div className="status-bar">
-        <span>
-          <span className="highlight">{keycaps.length}</span> / {capacity} slots used ({pct.toFixed(1)}%)
-        </span>
-        {box?.maker_name && (
-          <span>Maker: <span className="highlight">{box.maker_name}</span></span>
-        )}
-        <span>
-          <span className="highlight">{uniqueMakers.length}</span> makers represented
-        </span>
-        {movingCap && (
-          <span className="highlight">Moving: {movingCap.sculpt}</span>
-        )}
-      </div>
+      <StatusBar />
 
       <div className="box-detail-layout">
         <div className="box-detail-left">

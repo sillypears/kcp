@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchKeycaps, fetchBoxes } from "../api";
 import { Footer } from "../components/Footer";
+import { StatusBar } from "../components/StatusBar";
 
 function CountryFlag({ code, countryName }) {
   const codePoints = code
@@ -91,17 +92,7 @@ export function MakerPage() {
         </div>
       </header>
 
-      <div className="status-bar">
-        <span>
-          <span className="highlight">{uniqueSculpts.length}</span> sculpts
-        </span>
-        <span>
-          <span className="highlight">{boxed.length}</span> in boxes
-        </span>
-        <span>
-          <span className="highlight">{unboxed.length}</span> unboxed
-        </span>
-      </div>
+      <StatusBar />
 
       {(maker?.first_name || maker?.city || maker?.state || maker?.country) && (
         <div className="maker-info">

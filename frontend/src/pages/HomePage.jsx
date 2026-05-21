@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { KeycapModal, MoveModal, AddModal, AddBoxModal, AddMakerModal } from "../components/Modals";
 import { Footer } from "../components/Footer";
+import { StatusBar } from "../components/StatusBar";
 import {
   fetchKeycaps,
   fetchBoxes,
@@ -162,15 +163,7 @@ export function HomePage() {
         </div>
       </header>
 
-      <div className="status-bar">
-        <span><span className="highlight">{makers.length}</span> makers</span>
-        <span><span className="highlight">{filteredUniqueSculpts.length}</span> sculpts</span>
-        <span>{totalUsed}/{totalCapacity} slots used</span>
-        <span><span className="highlight">{boxes.length}</span> boxes</span>
-        {unboxed.length > 0 && (
-          <span><span className="highlight">{unboxed.length}</span> unboxed</span>
-        )}
-      </div>
+      <StatusBar />
 
       <div className="boxes-grid">
         {boxes.map((box) => {
