@@ -163,6 +163,7 @@ export function HomePage() {
       </header>
 
       <div className="status-bar">
+        <span><span className="highlight">{makers.length}</span> makers</span>
         <span><span className="highlight">{filteredUniqueSculpts.length}</span> sculpts</span>
         <span>{totalUsed}/{totalCapacity} slots used</span>
         <span><span className="highlight">{boxes.length}</span> boxes</span>
