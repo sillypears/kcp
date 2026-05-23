@@ -5,7 +5,7 @@ from psycopg2.extras import RealDictCursor
 import psycopg2.errors
 
 from api.database import get_db
-from api.schemas import MakerResponse, MakerCreate
+from api.schemas import MakerResponse, MakerCreate, MakerUpdate
 
 router = APIRouter(prefix="/api/makers", tags=["makers"])
 
@@ -60,6 +60,33 @@ def create_maker(
         return get_maker(new_id, db)
     except psycopg2.errors.UniqueViolation:
         raise HTTPException(status_code=409, detail="Maker already exists")
+
+
+@router.patch("/{maker_id}", response_model=MakerResponse)
+def update_maker(
+    maker_id: int, data: MakerUpdate, db: psycopg2.extensions.connection = Depends(get_db)
+):
+    cur = db.cursor(cursor_factory=RealDictCursor)
+
+    cur.execute("SELECT * FROM makers WHERE id = %s", (maker_id,))
+    if not cur.fetchone():
+        raise HTTPException(status_code=404, detail="Maker not found")
+
+    fields = []
+    values = []
+    for field in data.model_dump(exclude_unset=True):
+        fields.append(f"{field} = %s")
+        values.append(getattr(data, field))
+    if not fields:
+        raise HTTPException(status_code=400, detail="No fields to update")
+
+    values.append(maker_id)
+    cur.execute(
+        f"UPDATE makers SET {', '.join(fields)} WHERE id = %s RETURNING *",
+        values,
+    )
+    db.commit()
+    return cur.fetchone()
 
 
 @router.delete("/{maker_id}", status_code=204)

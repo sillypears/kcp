@@ -70,6 +70,19 @@ class MakerCreate(MakerBase):
     pass
 
 
+class MakerUpdate(BaseModel):
+    maker_name: Optional[str] = None
+    maker_name_clean: Optional[str] = None
+    instagram: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    country: Optional[str] = None
+    first_name: Optional[str] = None
+    state_code: Optional[str] = None
+    keycap_archivist_id: Optional[str] = None
+    keycap_archivist_name: Optional[str] = None
+
+
 class MakerResponse(MakerBase):
     id: int
 

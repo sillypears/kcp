@@ -79,6 +79,16 @@ export async function createMaker(data) {
   return res.json();
 }
 
+export async function updateMaker(id, data) {
+  const res = await fetch(`${API}/api/makers/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update maker");
+  return res.json();
+}
+
 export async function deleteMaker(id) {
   const res = await fetch(`${API}/api/makers/${id}`, { method: "DELETE" });
   if (!res.ok) throw new Error("Failed to delete maker");

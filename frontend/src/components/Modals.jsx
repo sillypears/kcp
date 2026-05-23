@@ -424,6 +424,126 @@ export function AddBoxModal({ onClose, onAdd }) {
   );
 }
 
+export function EditMakerModal({ maker, onClose, onSave }) {
+  const [form, setForm] = useState({
+    maker_name: maker.maker_name || "",
+    maker_name_clean: maker.maker_name_clean || "",
+    instagram: maker.instagram || "",
+    city: maker.city || "",
+    state: maker.state || "",
+    country: maker.country || "",
+    first_name: maker.first_name || "",
+    state_code: maker.state_code || "",
+    keycap_archivist_id: maker.keycap_archivist_id || "",
+    keycap_archivist_name: maker.keycap_archivist_name || "",
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const payload = {};
+    for (const [key, val] of Object.entries(form)) {
+      if (val !== (maker[key] || "")) {
+        payload[key] = val || null;
+      }
+    }
+    onSave(payload);
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <h2>Edit Maker</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Name</label>
+            <input
+              value={form.maker_name}
+              onChange={(e) => setForm({ ...form, maker_name: e.target.value })}
+              placeholder="e.g., Keycult"
+            />
+          </div>
+          <div className="form-group">
+            <label>Clean Name</label>
+            <input
+              value={form.maker_name_clean}
+              onChange={(e) => setForm({ ...form, maker_name_clean: e.target.value })}
+              placeholder="e.g., keycult"
+            />
+          </div>
+          <div className="form-group">
+            <label>Instagram</label>
+            <input
+              value={form.instagram}
+              onChange={(e) => setForm({ ...form, instagram: e.target.value })}
+              placeholder="username only"
+            />
+          </div>
+          <div className="form-group">
+            <label>First Name</label>
+            <input
+              value={form.first_name}
+              onChange={(e) => setForm({ ...form, first_name: e.target.value })}
+            />
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>City</label>
+              <input
+                value={form.city}
+                onChange={(e) => setForm({ ...form, city: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label>State</label>
+              <input
+                value={form.state}
+                onChange={(e) => setForm({ ...form, state: e.target.value })}
+              />
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Country</label>
+            <input
+              value={form.country}
+              onChange={(e) => setForm({ ...form, country: e.target.value })}
+            />
+          </div>
+          <div className="form-group">
+            <label>State Code</label>
+            <input
+              value={form.state_code}
+              onChange={(e) => setForm({ ...form, state_code: e.target.value })}
+              placeholder="e.g., CA"
+            />
+          </div>
+          <div className="form-group">
+            <label>Archivist ID</label>
+            <input
+              value={form.keycap_archivist_id}
+              onChange={(e) => setForm({ ...form, keycap_archivist_id: e.target.value })}
+            />
+          </div>
+          <div className="form-group">
+            <label>Archivist Name</label>
+            <input
+              value={form.keycap_archivist_name}
+              onChange={(e) => setForm({ ...form, keycap_archivist_name: e.target.value })}
+            />
+          </div>
+          <div className="modal-actions">
+            <button type="button" className="btn btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary">
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export function AddMakerModal({ onClose, onAdd }) {
   const [form, setForm] = useState({
     maker_name: "",

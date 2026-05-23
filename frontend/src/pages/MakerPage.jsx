@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { fetchKeycaps, fetchBoxes } from "../api";
+import { fetchKeycaps, fetchBoxes, updateMaker } from "../api";
 import { Footer } from "../components/Footer";
 import { StatusBar } from "../components/StatusBar";
+import { EditMakerModal } from "../components/Modals";
 
 function CountryFlag({ code, countryName }) {
   const codePoints = code
@@ -23,6 +24,7 @@ export function MakerPage() {
   const [keycaps, setKeycaps] = useState([]);
   const [boxes, setBoxes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showEdit, setShowEdit] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -58,6 +60,12 @@ export function MakerPage() {
 
   const uniqueSculpts = [...new Set(keycaps.map((c) => c.unique_id).filter(Boolean))];
 
+  const handleEditSave = async (payload) => {
+    const updated = await updateMaker(maker.id, payload);
+    setMaker(updated);
+    setShowEdit(false);
+  };
+
   return (
     <>
       <header className="app-header">
@@ -89,6 +97,9 @@ export function MakerPage() {
             </svg>
             </a>
           )}
+          <button className="btn btn-secondary" onClick={() => setShowEdit(true)} style={{ marginLeft: "auto" }}>
+            Edit
+          </button>
         </div>
       </header>
 
@@ -190,6 +201,10 @@ export function MakerPage() {
       )}
 
       <Footer />
+
+      {showEdit && maker && (
+        <EditMakerModal maker={maker} onClose={() => setShowEdit(false)} onSave={handleEditSave} />
+      )}
     </>
   );
 }
