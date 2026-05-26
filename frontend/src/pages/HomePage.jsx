@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { KeycapModal, MoveModal, AddModal, AddBoxModal, AddMakerModal } from "../components/Modals";
 import { Footer } from "../components/Footer";
 import { StatusBar } from "../components/StatusBar";
+import { UnboxedStatusBar } from "../components/UnboxedStatusBar";
 import {
   fetchKeycaps,
   fetchBoxes,
@@ -267,7 +268,10 @@ export function HomePage() {
 
       {unboxed.length > 0 && (
         <div className="unboxed-section">
-          <h2>Unboxed Keycaps</h2>
+          <div className="unboxed-header">
+            <h2>Unboxed Keycaps</h2>
+          </div>
+          <UnboxedStatusBar unboxed={unboxed} />
           <div className="unboxed-grid">
             {unboxed.map((cap) => (
               <div
