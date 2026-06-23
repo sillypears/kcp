@@ -9,6 +9,7 @@ export function KeycapModal({ cap, boxes, makers, onClose, onDelete, onEdit, onM
     maker_id: cap.maker_id,
     collab_id: cap.collab_id !== null ? cap.collab_id : "",
     box_id: cap.box_id,
+    free: cap.free,
   });
 
   const handleSave = () => {
@@ -78,6 +79,16 @@ export function KeycapModal({ cap, boxes, makers, onClose, onDelete, onEdit, onM
                 ))}
               </select>
             </div>
+            <div className="form-group">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={form.free}
+                  onChange={(e) => setForm({ ...form, free: e.target.checked })}
+                />
+                Free?
+              </label>
+            </div>
           </>
         ) : (
           <div className="keycap-detail">
@@ -106,6 +117,10 @@ export function KeycapModal({ cap, boxes, makers, onClose, onDelete, onEdit, onM
             <div className="detail-row">
               <span className="detail-label">Box</span>
               <span>{cap.label || "—"}</span>
+            </div>
+            <div className="detail-row">
+              <span className="detail-label">Free</span>
+              <span>{cap.free && "Yes" || "No"}</span>
             </div>
           </div>
         )}
@@ -191,7 +206,7 @@ export function MoveModal({ cap, boxes, inventory, onClose, onMove }) {
 }
 
 export function AddModal({ boxes, makers, keycaps, onClose, onAdd }) {
-  const [form, setForm] = useState({ sculpt: "", colorway: "", maker_id: "", collab_id: "", box_id: "" });
+  const [form, setForm] = useState({ sculpt: "", colorway: "", maker_id: "", collab_id: "", box_id: "", free: false});
 
   const findFirstEmptyCell = (boxId) => {
     if (!boxId || !keycaps) return { cell_x: 0, cell_y: 0 };
@@ -221,6 +236,7 @@ export function AddModal({ boxes, makers, keycaps, onClose, onAdd }) {
       box_id: boxId,
       cell_x: cell.cell_x,
       cell_y: cell.cell_y,
+      free: form.free,
     });
   };
 
@@ -286,6 +302,16 @@ export function AddModal({ boxes, makers, keycaps, onClose, onAdd }) {
                 </option>
               ))}
             </select>
+          </div>
+          <div className="form-group">
+            <label>
+              <input
+                type="checkbox"
+                checked={form.free}
+                onChange={(e) => setForm({ ...form, free: e.target.checked })}
+              />
+              Free?
+            </label>
           </div>
           <div className="modal-actions">
             <button type="button" className="btn btn-secondary" onClick={onClose}>

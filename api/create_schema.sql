@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS public.keycaps
     date_received date,
     date_sold date,
     keep_forever boolean DEFAULT false,
+    free boolean DEFAULT false,
     CONSTRAINT keycaps_pkey PRIMARY KEY (id),
     CONSTRAINT keycaps_maker_id_sculpt_colorway_key UNIQUE (maker_id, sculpt, colorway),
     CONSTRAINT keycaps_box_id_fkey FOREIGN KEY (box_id)
@@ -120,7 +121,8 @@ SELECT
     k.date_won AS date_won,
     k.date_received AS date_received,
     k.date_sold AS date_sold,
-    k.keep_forever AS keep_forever
+    k.keep_forever AS keep_forever,
+    k.free AS free
 FROM keycaps k
 LEFT JOIN makers m ON m.id = k.maker_id
 LEFT JOIN makers c on c.id = k.collab_id

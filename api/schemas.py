@@ -16,6 +16,7 @@ class KeycapBase(BaseModel):
     date_received: Optional[datetime] = None
     date_sold: Optional[datetime] = None
     keep_forever: Optional[bool] = False
+    free: Optional[bool] = False
 
 
 class KeycapCreate(KeycapBase):
@@ -35,6 +36,7 @@ class KeycapUpdate(BaseModel):
     date_received: Optional[datetime] = None
     date_sold: Optional[datetime] = None
     keep_forever: Optional[bool] = None
+    free: Optional[bool] = None
 
 
 class KeycapResponse(KeycapBase):

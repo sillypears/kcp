@@ -53,8 +53,8 @@ def create_keycap(
     cur = db.cursor(cursor_factory=RealDictCursor)
     cur.execute(
         """
-        INSERT INTO keycaps (maker_id, collab_id, box_id, cell_x, cell_y, sculpt, sculpt_clean, colorway, date_won, date_received, date_sold, keep_forever)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO keycaps (maker_id, collab_id, box_id, cell_x, cell_y, sculpt, sculpt_clean, colorway, date_won, date_received, date_sold, keep_forever, free)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id
     """,
         (
@@ -70,6 +70,7 @@ def create_keycap(
             data.date_received,
             data.date_sold,
             data.keep_forever,
+            data.free,
         ),
     )
     new_id = cur.fetchone()["id"]
@@ -103,6 +104,7 @@ def update_keycap(
         "date_received",
         "date_sold",
         "keep_forever",
+        "free",
     ]:
         val = getattr(data, field)
         if val is not None:
